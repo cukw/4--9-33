@@ -1,0 +1,25 @@
+name: Close Pull Requests
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              state: 'closed'
+            })
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## Pull Requests отключены\r\n\r\nЭтот репозиторий предназначен только для **пушей напрямую в ветки** `user/*`. Используйте `git push` вместо создания PR.'
+            })
